@@ -1,0 +1,34 @@
+---
+title: xxx
+author:
+  - Bharadwaj Popuri
+  - Mark Newman
+bibliography:
+  - paper/references.bib
+output:
+  pagedown::html_letter: 
+    pandoc_args: --mathjax
+    self_contained: true
+abstract: |
+  `r paste(readLines('paper/abstract.Rmd'), collapse = '\n  ')`
+url: 'https\://github.com/bharadwajpopuri/ANLY715'
+github-repo: bharadwajpopuri/ANLY715
+editor_options:
+  chunk_output_type: console
+---
+
+```{r include = F}
+here::i_am('index.Rmd')
+library(here)
+```
+
+```{r child = here('paper/introduction.Rmd')}
+```
+```{r child = here('paper/literature.Rmd')}
+```
+```{r child = here('paper/method.Rmd')}
+```
+```{r child = here('paper/results.Rmd')}
+```
+```{r child = here('paper/conclusion.Rmd')}
+```

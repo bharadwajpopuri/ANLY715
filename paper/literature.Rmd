@@ -1,0 +1,24 @@
+---
+title: "Literature Review"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include = F}
+here::i_am('paper/literature.Rmd')
+library(here)
+```
+
+# Literature Review
+
+Proin vestibulum lobortis convallis.
+Nulla in risus ac augue rutrum pharetra at at nisl.
+Maecenas eu libero maximus, congue odio in, scelerisque nunc.
+Nam placerat aliquam diam. Vivamus fermentum nisl at dolor porta, congue mattis massa imperdiet.
+Ut consequat mauris nisl, sit amet ullamcorper lorem tempor in.
+Nulla metus libero, venenatis ut tempor eget, eleifend eget diam.
+Proin convallis tincidunt fermentum. Phasellus dolor odio, suscipit quis dignissim vitae, faucibus vel metus.
+Duis interdum turpis eu venenatis mattis.
+Aenean ut ex sit amet mi malesuada maximus vel quis odio. Aliquam ut eros accumsan, interdum tortor a, commodo mauris.
+Integer vel purus non nunc viverra blandit vel nec mauris.
+Integer ac semper arcu.

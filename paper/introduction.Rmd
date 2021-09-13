@@ -1,0 +1,20 @@
+---
+title: "Introduction"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include = F}
+here::i_am('paper/introduction.Rmd')
+library(here)
+```
+
+# Introduction
+
+Maecenas at condimentum mi.
+Integer in volutpat ex.
+Donec finibus dui sed dui efficitur, ac interdum urna malesuada.
+Mauris dignissim a nulla nec lacinia.
+Maecenas bibendum lobortis ipsum ac dignissim.
+Vivamus tellus risus, mattis eu varius et, sodales volutpat dui.
+Morbi ultricies enim a augue mollis imperdiet.

@@ -1,0 +1,7 @@
+#IDE/Tools
+.Rhistory
+.RData
+
+#Knit
+*.html
+
