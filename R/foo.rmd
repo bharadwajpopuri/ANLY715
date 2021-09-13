@@ -1,0 +1,14 @@
+---
+title: "My first analysis"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r include = F}
+here::i_am('R/foo.Rmd')
+library(here)
+```
+
+```{r}
+data <- read.csv(here('data/Neuro_QoL__Cognition_Function_-_Short_Form.csv'))
+```
