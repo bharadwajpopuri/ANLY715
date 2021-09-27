@@ -4,11 +4,47 @@ editor_options:
   chunk_output_type: console
 ---
 
+```{r wd}
+getwd()
+```
+
+```{r wd2}
+getwd()
+setwd("/Users/bharadwajpopuri/Desktop/ANLY715/data")
+```
+
 ```{r include = F}
 here::i_am('R/foo.Rmd')
 library(here)
 ```
 
 ```{r}
-data <- read.csv(here('data/Neuro_QoL__Cognition_Function_-_Short_Form.csv'))
+data <- read.csv(here('data/Gait_Data___Arm_swing.csv'))
 ```
+
+```{r Summary}
+summary(data)
+```
+
+```{r objective1}
+# Calculate the mean for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+```
+
+```{r objective2}
+# Establish baseline range of values for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+```
+
+```{r objective3}
+# Create a table for outliers for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+```
+
+```{r objective4}
+# Measure the arm swing for patients in the outlier table
+```
+
+```{r objective5}
+# Using the "Quantification of Arm Swing during Walking in Healthy Adults and Parkinson’s Disease Patients- Wearable Sensor-Based Algorithm Development and Validation" paper to establish a frame of reference for arm swing, see if you can extrapolate the asymmetry and irregularity for imed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+```
+
+
+
