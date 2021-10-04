@@ -16,35 +16,215 @@ setwd("/Users/bharadwajpopuri/Desktop/ANLY715/data")
 ```{r include = F}
 here::i_am('R/foo.Rmd')
 library(here)
+library(scales)
+library(corrplot)
+library(gridExtra)
+library(glmnet)
 ```
 
 ```{r}
-data <- read.csv(here('data/Gait_Data___Arm_swing.csv'))
+data = "/Users/bharadwajpopuri/Desktop/ANLY715/data/Parkinson.Rdata"
+get(load(data))
 ```
 
-```{r Summary}
-summary(data)
+## Rescaling the data, so we can read normalized data
+
+```{r scales}
+library(scales)
+X.train = rescale(as.matrix(train[,7:22]))
+X.test = rescale(as.matrix(test[,7:22]))
+Y.train = rescale(train[,5])
+Y.test = rescale(test[ ,5])
 ```
 
-```{r objective1}
-# Calculate the mean for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+##  We have more than one predictor variable, we need to check if the effects are distinguishable by checking for Multicollinearity 
+
+```{r Multicollinearity}
+library(corrplot)
+M<-cor(X.train)
+head(round(M,2))
 ```
 
-```{r objective2}
-# Establish baseline range of values for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+## we can check for correlation among the predictors using a CorrPlot, by highlighting the most correlated variables in a data table.
+
+```{r Multicollinearity2}
+par(mfrow = c(1, 2))
+corrplot(M, method="pie", type = "lower", tl.col = "black")
+corrplot(M, method="number", type = "lower", number.cex = .7, tl.col = "black")
+title("Multicollinearity between Predictors", outer = TRUE, line = -3, cex = 5)
+corrplot
 ```
 
-```{r objective3}
-# Create a table for outliers for Sway, Timed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+## The predictor variables are strongly correlated meaning multicollinearity exists and will lead to prediction errors unless controlled.
+
+```{r}
+cor(train$V13, train$V15)
 ```
 
-```{r objective4}
-# Measure the arm swing for patients in the outlier table
+```{r}
+cor(train$V16, train$V19)
 ```
 
-```{r objective5}
-# Using the "Quantification of Arm Swing during Walking in Healthy Adults and Parkinson’s Disease Patients- Wearable Sensor-Based Algorithm Development and Validation" paper to establish a frame of reference for arm swing, see if you can extrapolate the asymmetry and irregularity for imed up and Go (TUG), Walking, Arm Swing(Frequency and Amplitude) and Axial Rotation
+```{r}
+cor(train$V8, train$V11)
+```
+
+## Simple Linear Regression
+```{r}
+fit.usual = lm(Y.train ~ X.train)
+summary(fit.usual)
+fit.usual$coefficients
+
+coef.usual = coef(fit.usual)
+Y.pred = coef.usual[1] + X.test%*%coef.usual[-1]
+
+error.usual = mean((Y.test - Y.pred)^2)
+error.usual
+
+```
+
+## We need to reduce the complexity and multi-collinearity, we can use ridge and lasso penalty to reduce multicollinearity and overfitting
+
+## Linear Regression with Penalty(ridge)
+
+## we can alter the lambda value to test the effect of penalty,  λ=0, penalty has no effect, and ridge regression will produce the classical least square coefficients. However, as λ increases to infinite, the impact of the shrinkage penalty grows, and the ridge regression coefficients will get close zero
+
+```{r message=TRUE}
+library(glmnet)
+fit.ridge = cv.glmnet(X.train, Y.train, alpha = 0)
+coef(fit.ridge)
+range(fit.ridge$lambda)
+Y.pred = predict(fit.ridge, X.test , s = "lambda.min")
+MSE.ridge = mean((Y.pred - Y.test)^2)
+MSE.ridge 
+```
+
+```{r message=TRUE}
+fit.ridge$lambda.min 
+```
+
+```{r message=TRUE}
+range(fit.ridge$lambda)
+```
+
+## Shrinkage = 1
+
+```{r message=TRUE}
+library(glmnet)
+fit.ridge = cv.glmnet(X.train, Y.train, alpha = 0)
+coef(fit.ridge)
+range(fit.ridge$lambda)
+Y.pred = predict(fit.ridge, X.test , s = 1)
+MSE.ridge = mean((Y.pred - Y.test)^2)
+MSE.ridge 
+```
+
+```{r message=TRUE}
+fit.ridge$lambda.min 
+```
+
+```{r message=TRUE}
+range(fit.ridge$lambda)
+```
+
+## Lasso Penalty makes coefficients to absolute zero as compared to Ridge which never sets the value of coefficient to absolute zero.
+
+```{r message=TRUE}
+library(glmnet)
+fit.lasso = cv.glmnet(X.train, Y.train)
+Y.pred = predict(fit.lasso, X.test , s = "lambda.min")
+MSE.ridge = mean((Y.pred - Y.test)^2)
+MSE.ridge 
+```
+
+```{r message=TRUE}
+fit.lasso$lambda.min 
+```
+
+```{r message=TRUE}
+range(fit.lasso$lambda)
+```
+
+## Refit Lambda value 
+
+```{r message=TRUE}
+library(glmnet)
+fit.lasso = cv.glmnet(X.train, Y.train)
+Y.pred = predict(fit.lasso, X.test , s = 0.05)
+MSE.ridge = mean((Y.pred - Y.test)^2)
+MSE.ridge 
+```
+
+## The Collinearity challenge is not being resolved, reducing the dimensions to the data might work, using PCA
+
+```{r message=TRUE}
+A = cov(X.train)
+eigen(A)$values
+which.max(eigen(A)$values)
+```
+## Woah, really large Eigen value!! most amount of information, check for other principal components.
+
+```{r message=TRUE}
+par(mfrow = c(1,2))
+plot(eigen(A)$values, type = "h", lwd = 5, col = "purple",
+     xlab = "PC's", ylab = "Eigenvalues")
+plot(eigen(A)$values[-1], type = "h", lwd = 5, col = "purple",
+     xlab = "PC's (minus the 1st)", ylab = "Eigenvalues") 
+title("The Significant PC's'", outer = TRUE, line = -2, cex = 3)
 ```
 
 
+```{r message=TRUE}
+C = eigen(A)$vectors
+new.train = cbind(X.train, X.train%*%C[,c(1:5)])
+```
 
+```{r message=TRUE}
+A = cov(X.test)
+eigen(A)$values
+which.max(eigen(A)$values)
+```
+
+```{r message=TRUE}
+C = eigen(A)$vectors
+new.test = cbind(X.test, X.test%*%C[,c(1:5)])
+```
+
+```{r message=TRUE}
+dim(new.train)
+new.xtrain = new.train[,17:21]
+dim(new.xtrain)
+new.xtest = new.test[,17:21]
+dim(new.xtest)
+```
+
+## Variable Selection
+```{r message=TRUE}
+coef(fit.lasso)
+```
+
+## 
+
+```{r}
+train.pca <- prcomp(X.train, center = TRUE, scale. = TRUE)
+print(train.pca)
+plot(train.pca, type = "l")
+test.pca <- prcomp(X.test, center = TRUE, scale. = TRUE)
+```
+
+```{r}
+new.xtrain = train.pca$x[,1:6]
+dim(new.xtrain)
+new.xtest = test.pca$x[,1:6]
+dim(new.xtest)
+```
+
+```{r}
+library(glmnet)
+fit.ridge = cv.glmnet(new.xtrain, Y.train, alpha = 0)
+coef(fit.ridge)
+range(fit.ridge$lambda)
+Y.pred = predict(fit.ridge, new.xtest , s = "lambda.min")
+MSE.ridge = mean((Y.pred - Y.test)^2)
+MSE.ridge 
+```
